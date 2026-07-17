@@ -3,6 +3,7 @@ import { getDocumentoDoUsuario } from "@/lib/data/processos";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { DocumentoAcoes } from "./documento-acoes";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 
 export const metadata: Metadata = { title: "Documento" };
 
@@ -18,10 +19,17 @@ export default async function DocumentoPage({
   params: Promise<{ id: string; docId: string }>;
 }) {
   const { id, docId } = await params;
-  const { documento } = await getDocumentoDoUsuario(docId);
+  const { documento, processo } = await getDocumentoDoUsuario(docId);
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
+      <Breadcrumbs
+        className="print:hidden"
+        items={[
+          { label: processo.numeroProcesso, href: `/processos/${id}` },
+          { label: TIPO_LABEL[documento.tipo] ?? documento.tipo },
+        ]}
+      />
       <div className="flex items-start justify-between gap-4 print:hidden">
         <div>
           <h1 className="text-2xl font-semibold">

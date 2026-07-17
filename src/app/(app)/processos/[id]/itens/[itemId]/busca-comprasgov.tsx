@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { formatarData, formatarMoeda } from "@/lib/utils";
 
 interface ResultadoComprasGov {
   fonte: "painel_precos_api";
@@ -144,7 +145,7 @@ export function BuscaComprasGov({
             >
               <div>
                 <p className="font-medium">
-                  R$ {resultado.valorUnitario.toFixed(2)} —{" "}
+                  R$ {formatarMoeda(resultado.valorUnitario)} —{" "}
                   {resultado.fornecedorOuOrigem}
                 </p>
                 <p className="text-muted-foreground">
@@ -152,7 +153,8 @@ export function BuscaComprasGov({
                 </p>
                 <p className="text-xs text-muted-foreground">
                   {resultado.fonteDetalhe.nomeOrgao} —{" "}
-                  {resultado.fonteDetalhe.estado} — {resultado.dataCotacao}
+                  {resultado.fonteDetalhe.estado} —{" "}
+                  {formatarData(resultado.dataCotacao)}
                 </p>
               </div>
               <Button

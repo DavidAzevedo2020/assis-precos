@@ -17,6 +17,20 @@ const NOME_METODO: Record<MetodoCalculo, string> = {
   menor_valor: "menor valor",
 };
 
+/** yyyy-mm-dd -> dd/mm/yyyy, via string (evita bug de fuso horário do `Date`). */
+function formatarData(dataIso: string): string {
+  const [ano, mes, dia] = dataIso.slice(0, 10).split("-");
+  return `${dia}/${mes}/${ano}`;
+}
+
+/** Formata no padrão monetário brasileiro — ex: 6793.84 -> "6.793,84". */
+function formatarMoeda(valor: number): string {
+  return valor.toLocaleString("pt-BR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}
+
 export interface MemoriaCalculo {
   item: ItemPesquisa;
   metodo: MetodoCalculo;
@@ -43,7 +57,7 @@ export function gerarMemoriaCalculo(
     .filter((c) => c.excluida)
     .map(
       (c) =>
-        `R$ ${c.valorUnitario.toFixed(2)} (${NOME_FONTE[c.fonte]}): ${c.motivoExclusao ?? "sem motivo registrado"}`,
+        `R$ ${formatarMoeda(c.valorUnitario)} (${NOME_FONTE[c.fonte]}): ${c.motivoExclusao ?? "sem motivo registrado"}`,
     );
 
   const linhasTexto = mapa.linhas
@@ -52,7 +66,7 @@ export function gerarMemoriaCalculo(
         l.situacao === "excluida"
           ? `EXCLUÍDA — ${l.motivoExclusao ?? "sem motivo registrado"}`
           : "considerada";
-      return `  - R$ ${l.valorUnitario.toFixed(2)} | ${NOME_FONTE[l.fonte]} | ${l.dataCotacao} | ${status}`;
+      return `  - R$ ${formatarMoeda(l.valorUnitario)} | ${NOME_FONTE[l.fonte]} | ${formatarData(l.dataCotacao)} | ${status}`;
     })
     .join("\n");
 
@@ -68,7 +82,7 @@ export function gerarMemoriaCalculo(
     ``,
     `Cotações consideradas: ${ativas.length} de ${cotacoes.length}`,
     `Método estatístico aplicado: ${NOME_METODO[metodo]} (Art. 6º da IN SEGES/ME nº 65/2021)`,
-    `Valor de referência resultante: R$ ${valorResultado.toFixed(2)}`,
+    `Valor de referência resultante: R$ ${formatarMoeda(valorResultado)}`,
     ...(justificativasExclusao.length > 0
       ? [``, `Justificativas de exclusão:`, ...justificativasExclusao.map((j) => `  - ${j}`)]
       : []),

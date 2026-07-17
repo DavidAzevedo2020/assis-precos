@@ -42,7 +42,7 @@ describe("gerarMemoriaCalculo", () => {
       "preço incompatível com o mercado",
     );
     expect(memoria.textoFormatado).toContain("MEMÓRIA DE CÁLCULO");
-    expect(memoria.textoFormatado).toContain("R$ 105.00");
+    expect(memoria.textoFormatado).toContain("R$ 105,00");
     expect(memoria.textoFormatado).toContain("Art. 6º");
   });
 });

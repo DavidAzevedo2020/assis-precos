@@ -69,3 +69,89 @@ export interface BuscarContratacoesParams {
   pagina?: number;
   tamanhoPagina?: number;
 }
+
+/**
+ * Item retornado pelo endpoint de busca por palavra-chave (`/api/search`) —
+ * o mesmo que alimenta a caixa de busca do site pncp.gov.br. Não faz parte
+ * da API de Consulta documentada no Manual de Integração PNCP e não traz
+ * valor estimado/homologado; use `orgaoCnpj` + `ano` + `numeroSequencial`
+ * para buscar o detalhe completo via `buscarDetalheContratacao`.
+ */
+export interface ItemBuscaPNCP {
+  numeroControlePNCP: string;
+  title: string;
+  description: string;
+  orgaoCnpj: string;
+  orgaoNome: string;
+  ano: string;
+  numeroSequencial: string;
+  municipioNome?: string;
+  uf?: string;
+  dataPublicacaoPncp: string;
+}
+
+export interface RespostaBuscaPNCP {
+  items: ItemBuscaPNCP[];
+  totalItems: number;
+}
+
+export interface BuscarPorPalavraChaveParams {
+  q: string;
+  pagina?: number;
+  tamanhoPagina?: number;
+}
+
+/** Tipos de documento pesquisáveis via busca por palavra-chave (endpoint `/api/search`). */
+export type TipoDocumentoAtaOuContrato = "ata" | "contrato";
+
+/**
+ * Item retornado pela busca por palavra-chave quando `tipos_documento` é
+ * "ata" ou "contrato". Diferente de `ItemBuscaPNCP` (editais), já traz órgão,
+ * esfera, datas e valor global — não é preciso buscar detalhe separado.
+ * Mesma ressalva de `buscarPorPalavraChave`: endpoint não documentado no
+ * Manual de Integração PNCP, pode mudar sem aviso.
+ */
+export interface ItemBuscaAtaOuContratoPNCP {
+  numeroControlePNCP: string;
+  tipoDocumento: TipoDocumentoAtaOuContrato;
+  titulo: string;
+  descricao: string;
+  orgaoNome: string;
+  esferaNome?: string;
+  municipioNome?: string;
+  uf?: string;
+  dataAssinatura?: string;
+  dataFimVigencia?: string;
+  /** Valor total do contrato/empenho. Atas de registro de preços normalmente não têm valor global (null). */
+  valorGlobal: number | null;
+  cancelado: boolean;
+  url: string;
+}
+
+export interface RespostaBuscaAtaOuContratoPNCP {
+  items: ItemBuscaAtaOuContratoPNCP[];
+  totalItems: number;
+}
+
+export interface BuscarAtaOuContratoPorPalavraChaveParams {
+  q: string;
+  tipoDocumento: TipoDocumentoAtaOuContrato;
+  pagina?: number;
+  tamanhoPagina?: number;
+}
+
+/**
+ * Detalhe de um item de contratação. `catalogo` identifica de qual catálogo
+ * vem `catalogoCodigoItem` — o PNCP reconhece hoje apenas dois:
+ * id=1 "Catálogo do Compras.gov.br" (o mesmo CATMAT/CATSER usado pela API do
+ * Compras.gov.br) e id=2 "Outros" (código não-padronizado, sem
+ * correspondência garantida). Muitos órgãos não preenchem esse campo.
+ */
+export interface ItemDetalhePNCP {
+  numeroItem: number;
+  descricao: string;
+  materialOuServico?: "M" | "S";
+  materialOuServicoNome?: string;
+  catalogo?: { id: number; nome: string } | null;
+  catalogoCodigoItem?: string | null;
+}

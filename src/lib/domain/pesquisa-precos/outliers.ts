@@ -1,6 +1,14 @@
 import { calcularMedia, calcularDesvioPadrao } from "./estatistica";
 import type { Cotacao } from "./types";
 
+/** Formata no padrão monetário brasileiro — ex: 6793.84 -> "6.793,84". */
+function formatarMoeda(valor: number): string {
+  return valor.toLocaleString("pt-BR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}
+
 export type MetodoDeteccao = "iqr" | "desvio_padrao";
 
 export interface CandidataExclusao {
@@ -67,12 +75,12 @@ export function detectarOutliers(
     if (cotacao.valorUnitario < limiteInferior) {
       candidatas.push({
         cotacao,
-        motivoSugerido: `Valor R$ ${cotacao.valorUnitario.toFixed(2)} está abaixo do limite inferior estimado (R$ ${limiteInferior.toFixed(2)}) — possível preço inexequível.`,
+        motivoSugerido: `Valor R$ ${formatarMoeda(cotacao.valorUnitario)} está abaixo do limite inferior estimado (R$ ${formatarMoeda(limiteInferior)}) — possível preço inexequível.`,
       });
     } else if (cotacao.valorUnitario > limiteSuperior) {
       candidatas.push({
         cotacao,
-        motivoSugerido: `Valor R$ ${cotacao.valorUnitario.toFixed(2)} está acima do limite superior estimado (R$ ${limiteSuperior.toFixed(2)}) — possível preço excessivamente elevado.`,
+        motivoSugerido: `Valor R$ ${formatarMoeda(cotacao.valorUnitario)} está acima do limite superior estimado (R$ ${formatarMoeda(limiteSuperior)}) — possível preço excessivamente elevado.`,
       });
     } else {
       validas.push(cotacao);

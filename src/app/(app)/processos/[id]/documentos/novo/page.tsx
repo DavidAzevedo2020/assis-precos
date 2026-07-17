@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DfdForm } from "./dfd-form";
 import { EtpForm } from "./etp-form";
 import { NotaTecnicaForm } from "./nota-tecnica-form";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 
 export const metadata: Metadata = { title: "Novo documento" };
 
@@ -13,10 +14,16 @@ export default async function NovoDocumentoPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  await getProcessoDoUsuario(id);
+  const processo = await getProcessoDoUsuario(id);
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
+      <Breadcrumbs
+        items={[
+          { label: processo.numeroProcesso, href: `/processos/${id}` },
+          { label: "Novo documento" },
+        ]}
+      />
       <div>
         <h1 className="text-2xl font-semibold">Novo documento</h1>
         <p className="text-muted-foreground">

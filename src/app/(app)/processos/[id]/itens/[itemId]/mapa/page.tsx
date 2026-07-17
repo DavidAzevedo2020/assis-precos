@@ -6,6 +6,8 @@ import { calculos, cotacoes } from "@/lib/db/schema";
 import { gerarMapaComparativo } from "@/lib/domain/pesquisa-precos/mapa-comparativo";
 import { gerarMemoriaCalculo } from "@/lib/domain/pesquisa-precos/memoria-calculo";
 import type { Cotacao } from "@/lib/domain/pesquisa-precos/types";
+import { formatarData, formatarMoeda } from "@/lib/utils";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import {
   Table,
   TableBody,
@@ -17,6 +19,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { ExportarAcoes } from "@/components/exportar-acoes";
 
 export const metadata: Metadata = { title: "Mapa comparativo" };
 
@@ -39,8 +42,8 @@ export default async function MapaComparativoPage({
 }: {
   params: Promise<{ id: string; itemId: string }>;
 }) {
-  const { itemId } = await params;
-  const { item } = await getItemDoUsuario(itemId);
+  const { id, itemId } = await params;
+  const { item, processo } = await getItemDoUsuario(itemId);
 
   const [linhasCotacoes, [ultimoCalculo]] = await Promise.all([
     db.select().from(cotacoes).where(eq(cotacoes.itemId, itemId)),
@@ -81,15 +84,59 @@ export default async function MapaComparativoPage({
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Mapa comparativo de preços</h1>
-        <p className="text-muted-foreground">{item.descricao}</p>
+      <Breadcrumbs
+        className="print:hidden"
+        items={[
+          { label: processo.numeroProcesso, href: `/processos/${id}` },
+          { label: item.descricao, href: `/processos/${id}/itens/${itemId}` },
+          { label: "Mapa comparativo" },
+        ]}
+      />
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold">Mapa comparativo de preços</h1>
+          <p className="text-muted-foreground">{item.descricao}</p>
+        </div>
+        <ExportarAcoes
+          nomeArquivo={`mapa-comparativo-${item.descricao}`}
+          linhas={[
+            ["Mapa comparativo de preços"],
+            ["Item", item.descricao],
+            ...(memoria
+              ? [
+                  ["Método aplicado", METODO_LABEL[memoria.metodo]],
+                  ["Valor de referência", formatarMoeda(memoria.valorResultado)],
+                  [
+                    "Cotações consideradas",
+                    `${memoria.totalCotacoesConsideradas} de ${memoria.totalCotacoesConsideradas + memoria.totalCotacoesExcluidas}`,
+                  ],
+                ]
+              : [["Nenhum cálculo realizado ainda"]]),
+            [],
+            ["Série de preços coletados"],
+            ["Fonte", "Valor", "Data", "Origem", "Situação"],
+            ...mapa.linhas.map((linha) => [
+              FONTE_LABEL[linha.fonte] ?? linha.fonte,
+              formatarMoeda(linha.valorUnitario),
+              formatarData(linha.dataCotacao),
+              linha.fornecedorOuOrigem ?? "",
+              linha.situacao === "excluida" ? "Excluída" : "Considerada",
+            ]),
+            ...(memoria
+              ? [
+                  [],
+                  ["Memória de cálculo"],
+                  ...memoria.textoFormatado.split("\n").map((linhaTexto) => [linhaTexto]),
+                ]
+              : []),
+          ]}
+        />
       </div>
 
       {memoria ? (
         <Alert>
           <AlertTitle>
-            {METODO_LABEL[memoria.metodo]}: R$ {memoria.valorResultado.toFixed(2)}
+            {METODO_LABEL[memoria.metodo]}: R$ {formatarMoeda(memoria.valorResultado)}
           </AlertTitle>
           <AlertDescription>
             Calculado com {memoria.totalCotacoesConsideradas} de{" "}
@@ -126,8 +173,8 @@ export default async function MapaComparativoPage({
               {mapa.linhas.map((linha) => (
                 <TableRow key={linha.cotacaoId}>
                   <TableCell>{FONTE_LABEL[linha.fonte] ?? linha.fonte}</TableCell>
-                  <TableCell>R$ {linha.valorUnitario.toFixed(2)}</TableCell>
-                  <TableCell>{linha.dataCotacao}</TableCell>
+                  <TableCell>R$ {formatarMoeda(linha.valorUnitario)}</TableCell>
+                  <TableCell>{formatarData(linha.dataCotacao)}</TableCell>
                   <TableCell>{linha.fornecedorOuOrigem ?? "—"}</TableCell>
                   <TableCell>
                     {linha.situacao === "excluida" ? (

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   calcularCoeficienteVariacao,
   calcularDesvioPadrao,
+  calcularMaiorValor,
   calcularMedia,
   calcularMediana,
   calcularMenorValor,
@@ -43,6 +44,12 @@ describe("calcularMediana", () => {
 describe("calcularMenorValor", () => {
   it("retorna o menor valor do conjunto", () => {
     expect(calcularMenorValor([50, 10, 30])).toBe(10);
+  });
+});
+
+describe("calcularMaiorValor", () => {
+  it("retorna o maior valor do conjunto", () => {
+    expect(calcularMaiorValor([50, 10, 30])).toBe(50);
   });
 });
 

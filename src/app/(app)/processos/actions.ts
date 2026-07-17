@@ -56,3 +56,27 @@ export async function atualizarStatusProcesso(
 
   revalidatePath(`/processos/${processoId}`);
 }
+
+/** Itens, cotações, cálculos e documentos do processo são removidos em cascata pelo banco. */
+export async function removerProcesso(
+  processoId: string,
+): Promise<{ ok: boolean; mensagem?: string }> {
+  const session = await verifySession();
+
+  const excluidos = await db
+    .delete(processos)
+    .where(
+      and(
+        eq(processos.id, processoId),
+        eq(processos.responsavelId, session.userId),
+      ),
+    )
+    .returning({ id: processos.id });
+
+  if (excluidos.length === 0) {
+    return { ok: false, mensagem: "Processo não encontrado." };
+  }
+
+  revalidatePath("/dashboard");
+  return { ok: true };
+}

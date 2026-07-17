@@ -22,3 +22,15 @@ export const exclusaoCotacaoSchema = z.object({
   excluida: z.boolean(),
   motivoExclusao: z.string().trim().optional(),
 });
+
+export const solicitarCotacaoEmailSchema = z.object({
+  destinatarios: z
+    .array(z.email({ error: "Endereço de e-mail inválido." }))
+    .min(1, { error: "Informe pelo menos um fornecedor." }),
+  assunto: z.string().trim().min(1, { error: "Informe o assunto." }),
+  mensagem: z.string().trim().min(1, { error: "Informe a mensagem." }),
+});
+
+export type SolicitarCotacaoEmailInput = z.infer<
+  typeof solicitarCotacaoEmailSchema
+>;

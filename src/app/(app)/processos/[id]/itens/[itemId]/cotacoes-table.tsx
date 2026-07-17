@@ -18,6 +18,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { formatarData, formatarMoeda } from "@/lib/utils";
 import {
   Dialog,
   DialogClose,
@@ -107,8 +108,8 @@ export function CotacoesTable({
           {cotacoes.map((cotacao) => (
             <TableRow key={cotacao.id}>
               <TableCell>{FONTE_LABEL[cotacao.fonte] ?? cotacao.fonte}</TableCell>
-              <TableCell>R$ {Number(cotacao.valorUnitario).toFixed(2)}</TableCell>
-              <TableCell>{cotacao.dataCotacao}</TableCell>
+              <TableCell>R$ {formatarMoeda(Number(cotacao.valorUnitario))}</TableCell>
+              <TableCell>{formatarData(cotacao.dataCotacao)}</TableCell>
               <TableCell>{cotacao.fornecedorOuOrigem ?? "—"}</TableCell>
               <TableCell>
                 {cotacao.excluida ? (

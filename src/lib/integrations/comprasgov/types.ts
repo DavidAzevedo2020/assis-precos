@@ -13,6 +13,8 @@ export interface ItemPesquisaPrecoComprasGov {
   nomeOrgao?: string;
   estado?: string;
   municipio?: string;
+  codigoUasg?: string;
+  nomeUasg?: string;
 }
 
 export interface RespostaPesquisaPrecoComprasGov {

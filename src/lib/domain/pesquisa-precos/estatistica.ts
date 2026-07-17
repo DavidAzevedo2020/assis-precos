@@ -35,6 +35,11 @@ export function calcularMenorValor(valores: number[]): number {
   return Math.min(...valores);
 }
 
+export function calcularMaiorValor(valores: number[]): number {
+  assertNaoVazio(valores);
+  return Math.max(...valores);
+}
+
 export function calcularDesvioPadrao(valores: number[]): number {
   assertNaoVazio(valores);
   if (valores.length === 1) return 0;

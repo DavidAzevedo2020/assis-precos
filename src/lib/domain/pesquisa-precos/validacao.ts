@@ -1,5 +1,13 @@
 import type { Cotacao } from "./types";
 
+/** Formata no padrão monetário brasileiro — ex: 6793.84 -> "6.793,84". */
+function formatarMoeda(valor: number): string {
+  return valor.toLocaleString("pt-BR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}
+
 export interface ResultadoValidacao {
   valido: boolean;
   mensagens: string[];
@@ -63,7 +71,7 @@ export function validarJustificativasExclusao(
     valido: false,
     mensagens: semJustificativa.map(
       (c) =>
-        `A cotação de R$ ${c.valorUnitario.toFixed(2)} (fonte: ${c.fonte}) foi marcada como excluída, mas não possui motivo registrado.`,
+        `A cotação de R$ ${formatarMoeda(c.valorUnitario)} (fonte: ${c.fonte}) foi marcada como excluída, mas não possui motivo registrado.`,
     ),
   };
 }

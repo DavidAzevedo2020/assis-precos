@@ -5,6 +5,8 @@ import { FileText, Plus } from "lucide-react";
 import { getProcessoDoUsuario } from "@/lib/data/processos";
 import { db } from "@/lib/db";
 import { documentos, itens } from "@/lib/db/schema";
+import { formatarQuantidade } from "@/lib/utils";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -38,6 +40,7 @@ export default async function ProcessoPage({
 
   return (
     <div className="space-y-8">
+      <Breadcrumbs items={[{ label: processo.numeroProcesso }]} />
       <div>
         <h1 className="text-2xl font-semibold">{processo.numeroProcesso}</h1>
         <p className="text-muted-foreground">{processo.objeto}</p>
@@ -46,7 +49,7 @@ export default async function ProcessoPage({
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-medium">Itens pesquisados</h2>
-          <Button render={<Link href={`/processos/${id}/itens/novo`} />} size="sm" variant="outline">
+          <Button render={<Link href={`/processos/${id}/itens/novo`} />} nativeButton={false} size="sm" variant="outline">
             <Plus className="size-4" />
             Novo item
           </Button>
@@ -65,7 +68,7 @@ export default async function ProcessoPage({
                     <CardTitle className="text-base">{item.descricao}</CardTitle>
                   </CardHeader>
                   <CardContent className="text-sm text-muted-foreground">
-                    {item.quantidade} {item.unidadeMedida}
+                    {formatarQuantidade(item.quantidade)} {item.unidadeMedida}
                   </CardContent>
                 </Card>
               </Link>
@@ -79,7 +82,7 @@ export default async function ProcessoPage({
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-medium">Documentos</h2>
-          <Button render={<Link href={`/processos/${id}/documentos/novo`} />} size="sm" variant="outline">
+          <Button render={<Link href={`/processos/${id}/documentos/novo`} />} nativeButton={false} size="sm" variant="outline">
             <Plus className="size-4" />
             Novo documento
           </Button>
