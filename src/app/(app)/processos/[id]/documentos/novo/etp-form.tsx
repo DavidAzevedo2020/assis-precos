@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { etpSchema, type EtpInput } from "@/lib/ai/document-schemas";
+import type { ResumoPesquisaProcesso } from "@/lib/data/processos";
 import { obterUltimoDocumento } from "../actions";
 import { gerarDocumentoStream } from "./gerar-documento";
 import { PreviewPanel } from "./preview-panel";
@@ -40,14 +41,24 @@ const CAMPOS: {
   { nome: "posicionamentoConclusivo", label: "XIII - Posicionamento conclusivo", obrigatorio: true },
 ];
 
-export function EtpForm({ processoId }: { processoId: string }) {
+export function EtpForm({
+  processoId,
+  resumo,
+}: {
+  processoId: string;
+  resumo: ResumoPesquisaProcesso;
+}) {
   const router = useRouter();
   const [gerando, setGerando] = useState(false);
   const [texto, setTexto] = useState("");
 
   const form = useForm<EtpInput>({
     resolver: zodResolver(etpSchema),
-    defaultValues: Object.fromEntries(CAMPOS.map((c) => [c.nome, ""])) as EtpInput,
+    defaultValues: {
+      ...(Object.fromEntries(CAMPOS.map((c) => [c.nome, ""])) as EtpInput),
+      estimativaQuantidades: resumo.quantidadeEstimadaTexto,
+      estimativaValor: resumo.valorEstimadoTexto,
+    },
   });
 
   async function onSubmit(dados: EtpInput) {

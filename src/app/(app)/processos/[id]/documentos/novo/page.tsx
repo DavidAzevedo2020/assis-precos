@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
-import { getProcessoDoUsuario } from "@/lib/data/processos";
+import {
+  getProcessoDoUsuario,
+  obterResumoPesquisaDoProcesso,
+} from "@/lib/data/processos";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DfdForm } from "./dfd-form";
 import { EtpForm } from "./etp-form";
@@ -15,6 +18,7 @@ export default async function NovoDocumentoPage({
 }) {
   const { id } = await params;
   const processo = await getProcessoDoUsuario(id);
+  const resumo = await obterResumoPesquisaDoProcesso(id);
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
@@ -31,6 +35,24 @@ export default async function NovoDocumentoPage({
         </p>
       </div>
 
+      {resumo.quantidadeEstimadaTexto && (
+        <p className="rounded-md border border-dashed p-3 text-sm text-muted-foreground">
+          Quantidade e valor estimados foram pré-preenchidos a partir da
+          pesquisa de preços deste processo — revise antes de gerar o
+          documento.
+          {resumo.itensSemPreco.length > 0 && (
+            <>
+              {" "}
+              <span className="font-medium text-destructive">
+                Atenção:
+              </span>{" "}
+              os itens {resumo.itensSemPreco.join(", ")} ainda não têm preço
+              de referência calculado; o valor total pode estar incompleto.
+            </>
+          )}
+        </p>
+      )}
+
       <Tabs defaultValue="DFD">
         <TabsList>
           <TabsTrigger value="DFD">DFD</TabsTrigger>
@@ -38,13 +60,13 @@ export default async function NovoDocumentoPage({
           <TabsTrigger value="NOTA_TECNICA">Nota Técnica</TabsTrigger>
         </TabsList>
         <TabsContent value="DFD" className="pt-4">
-          <DfdForm processoId={id} />
+          <DfdForm processoId={id} resumo={resumo} />
         </TabsContent>
         <TabsContent value="ETP" className="pt-4">
-          <EtpForm processoId={id} />
+          <EtpForm processoId={id} resumo={resumo} />
         </TabsContent>
         <TabsContent value="NOTA_TECNICA" className="pt-4">
-          <NotaTecnicaForm processoId={id} />
+          <NotaTecnicaForm processoId={id} resumo={resumo} />
         </TabsContent>
       </Tabs>
     </div>

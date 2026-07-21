@@ -6,6 +6,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { dfdSchema, type DfdInput } from "@/lib/ai/document-schemas";
+import type { ResumoPesquisaProcesso } from "@/lib/data/processos";
+import { mascararMoeda } from "@/lib/utils";
 import { obterUltimoDocumento } from "../actions";
 import { gerarDocumentoStream } from "./gerar-documento";
 import { PreviewPanel } from "./preview-panel";
@@ -28,7 +30,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-export function DfdForm({ processoId }: { processoId: string }) {
+export function DfdForm({
+  processoId,
+  resumo,
+}: {
+  processoId: string;
+  resumo: ResumoPesquisaProcesso;
+}) {
   const router = useRouter();
   const [gerando, setGerando] = useState(false);
   const [texto, setTexto] = useState("");
@@ -36,11 +44,11 @@ export function DfdForm({ processoId }: { processoId: string }) {
   const form = useForm<DfdInput>({
     resolver: zodResolver(dfdSchema),
     defaultValues: {
-      objeto: "",
+      objeto: resumo.objeto,
       justificativaNecessidade: "",
       unidadeRequisitante: "",
-      quantidadeEstimada: "",
-      valorEstimado: "",
+      quantidadeEstimada: resumo.quantidadeEstimadaTexto,
+      valorEstimado: resumo.valorEstimadoTexto,
       dataPretendida: "",
       grauPrioridade: "medio",
       observacoes: "",
@@ -125,7 +133,12 @@ export function DfdForm({ processoId }: { processoId: string }) {
                 <FormItem>
                   <FormLabel>Valor estimado</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input
+                      {...field}
+                      inputMode="numeric"
+                      placeholder="R$ 0,00"
+                      onChange={(e) => field.onChange(mascararMoeda(e.target.value))}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

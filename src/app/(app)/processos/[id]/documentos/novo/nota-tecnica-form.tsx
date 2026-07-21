@@ -9,6 +9,7 @@ import {
   notaTecnicaSchema,
   type NotaTecnicaInput,
 } from "@/lib/ai/document-schemas";
+import type { ResumoPesquisaProcesso } from "@/lib/data/processos";
 import { obterUltimoDocumento } from "../actions";
 import { gerarDocumentoStream } from "./gerar-documento";
 import { PreviewPanel } from "./preview-panel";
@@ -24,7 +25,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-export function NotaTecnicaForm({ processoId }: { processoId: string }) {
+export function NotaTecnicaForm({
+  processoId,
+  resumo,
+}: {
+  processoId: string;
+  resumo: ResumoPesquisaProcesso;
+}) {
   const router = useRouter();
   const [gerando, setGerando] = useState(false);
   const [texto, setTexto] = useState("");
@@ -32,8 +39,8 @@ export function NotaTecnicaForm({ processoId }: { processoId: string }) {
   const form = useForm<NotaTecnicaInput>({
     resolver: zodResolver(notaTecnicaSchema),
     defaultValues: {
-      assunto: "",
-      referenciaProcesso: "",
+      assunto: `Contratação referente a ${resumo.objeto}`,
+      referenciaProcesso: resumo.numeroProcesso,
       destinatario: "",
       analise: "",
       conclusao: "",

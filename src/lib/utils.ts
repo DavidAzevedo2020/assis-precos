@@ -29,6 +29,17 @@ export function formatarMoeda(valor: number): string {
   })
 }
 
+/**
+ * Aplica máscara de moeda brasileira a uma string digitada livremente,
+ * tratando os dígitos como centavos — ex: "12345" -> "R$ 123,45".
+ */
+export function mascararMoeda(valorDigitado: string): string {
+  const digitos = valorDigitado.replace(/\D/g, "")
+  if (!digitos) return ""
+  const centavos = Number(digitos) / 100
+  return `R$ ${formatarMoeda(centavos)}`
+}
+
 /** Iniciais a partir de um nome — ex: "David Azevedo" -> "DA". */
 export function formatarIniciais(nome: string): string {
   const partes = nome.trim().split(/\s+/)
